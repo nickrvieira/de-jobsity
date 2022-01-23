@@ -1,28 +1,24 @@
-from load.base_load import AbstractLoad
-from sink.base_sink import AbstractSink
 from pyspark.sql.types import DoubleType
-from utils.logger import get_logger_instance
-
 from pyspark.sql.functions import col, count, regexp_extract, to_timestamp
 
+from pipeline.base_pipeline import BasePipeline
 
-class TripsPipeline:
-    def __init__(
-        self, input: AbstractLoad, sink: AbstractSink, cache_on_load: bool = True
-    ) -> None:
-        self.input = input
-        self.sink = sink
-        self.cache_on_load = cache_on_load
-        self.pipeline = [
+
+class Trips(BasePipeline):
+    def __init__(self, **kwargs) -> None:
+        super(Trips, self).__init__(**kwargs)
+
+    @property
+    def pipeline(self):
+        return [
             self.parse_coordinate_points("origin_coord"),
             self.parse_coordinate_points("destination_coord"),
             self.format_datetime,
             self.group_duplicates,
         ]
-        self.logger = get_logger_instance()
 
     def format_datetime(
-        self, df, column_name="datetime", pattern="yyyy-MM-dd hh:mm:ss"
+        self, df, column_name="datetime", pattern="yyyy-MM-dd HH:mm:ss"
     ):
         return df.withColumn(column_name, to_timestamp(col(column_name), pattern))
 
@@ -54,14 +50,3 @@ class TripsPipeline:
             return df
 
         return parse_dataframe
-
-    def run(self):
-        df = self.input.load()
-        if self.cache_on_load:
-            self.logger.info("Caching the dataframe")
-            df = df.cache()
-        for process in self.pipeline:
-            self.logger.info("Running method in %s - %s", self, process)
-            df = process(df)
-
-        return df

@@ -1,0 +1,13 @@
+services:
+    postgres:
+        image: postgres:13
+        container_name: postgres
+        environment:
+            - POSTGRES_USER=naniviaa
+            - POSTGRES_PASSWORD=123456
+            - POSTGRES_DB=jobsity
+        volumes:
+            - ./pgdata:/var/lib/postgresql/data:rw
+        restart: always
+        ports:
+            - "5432:5432"
