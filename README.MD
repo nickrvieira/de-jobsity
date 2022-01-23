@@ -1,16 +1,15 @@
-
-- [2. Intro](#2-intro)
-- [3. Project Structure](#3-project-structure)
-- [4. Mandatory Features:](#4-mandatory-features)
-- [5. Running Samples](#5-running-samples)
-  - [5.1. Reading from CSV and Sinking to JDBC](#51-reading-from-csv-and-sinking-to-jdbc)
-  - [5.2. Reading from JDBC and Sinking to CSV - Aggregated Pipeline](#52-reading-from-jdbc-and-sinking-to-csv---aggregated-pipeline)
-- [6. Scalability](#6-scalability)
-- [7. On the Cloud](#7-on-the-cloud)
-- [8. Future Enhancements](#8-future-enhancements)
-  - [8.1. Testing](#81-testing)
-
-## 2. Intro
+- [1. Intro](#1-intro)
+- [2. Project Structure](#2-project-structure)
+- [3. Mandatory Features:](#3-mandatory-features)
+- [4. Running Samples](#4-running-samples)
+  - [4.1. Reading from CSV and Sinking to JDBC](#41-reading-from-csv-and-sinking-to-jdbc)
+  - [4.2. Reading from JDBC and Sinking to CSV - Aggregated Pipeline](#42-reading-from-jdbc-and-sinking-to-csv---aggregated-pipeline)
+- [5. Scalability](#5-scalability)
+- [6. On the Cloud](#6-on-the-cloud)
+- [7. Future Enhancements](#7-future-enhancements)
+  - [7.1. Testing](#71-testing)
+  
+## 1. Intro
 
 This is a simple pipeline processing tool, consisting of three core ideas:
 - Loads
@@ -23,7 +22,7 @@ This is a simple pipeline processing tool, consisting of three core ideas:
 
 **Sinks** Specifies where files will be written
 
-## 3. Project Structure
+## 2. Project Structure
 
 ```
 .
@@ -31,8 +30,6 @@ This is a simple pipeline processing tool, consisting of three core ideas:
 ├── Dockerfile
 ├── Makefile
 ├── README.MD
-├── source_data
-│   └── trips.csv
 └── src
     ├── adapters
     │   └── slack.py
@@ -61,7 +58,7 @@ This is a simple pipeline processing tool, consisting of three core ideas:
         └── logger.py
 ```
 
-## 4. Mandatory Features:
+## 3. Mandatory Features:
 - There must be an automated process to ingest and store the data. 100%
 
 ---
@@ -94,7 +91,7 @@ Data models are controversial - mainly in this scenario - Indeed I could create 
 
 In stores such as columnar stores, data modeling in this scenario should be carefully reviewed - It may bring organization, but it adds complexity and, depending on the stack, increases the computational load for both reading (consumer/end user) and writing (pipeline processes).
 
-For scalability, please refer to item [6. Scalability](#6-scalability)
+For scalability, please refer to item [6. Scalability](#5-scalability)
 
 ---
 
@@ -104,9 +101,9 @@ For scalability, please refer to item [6. Scalability](#6-scalability)
 
 ---
 
-## 5. Running Samples
+## 4. Running Samples
 
-### 5.1. Reading from CSV and Sinking to JDBC
+### 4.1. Reading from CSV and Sinking to JDBC
 
 PS: `conn_uri` is base64 decoded for the sake of special characters breaking args.
 
@@ -120,17 +117,17 @@ python main.py --load-config '{"load_type":"GenericPySparkLoad", "options": {"pa
                --pipeline '{"pipeline_name": "Trips", "options":{}}'
 ```
 
-### 5.2. Reading from JDBC and Sinking to CSV - Aggregated Pipeline
+### 4.2. Reading from JDBC and Sinking to CSV - Aggregated Pipeline
 ```
 python main.py --load-config '{"load_type":"JDBCLoad", "options":{"conn_uri": "amRiYzpwb3N0Z3Jlc3FsOi8vbG9jYWxob3N0OjU0MzIvam9ic2l0eT91c2VyPW5hbml2aWFhJnBhc3N3b3JkPTEyMzQ1Ng==", "table": "trips"}  }' \
                --sink-config '{"sink_type": "GenericPySparkSink", "options":{"format":"json", "path":"./application_data/output/python/", "mode":"overwrite"}}' \
                --pipeline '{"pipeline_name": "TripsAggregated", "options":{"region":"Turin", "p1":[7.54, 44], "p2":[7.70, 46]}}'
 ```
 
-## 6. Scalability
+## 5. Scalability
 
-Spark lazy evaluates all dataframes - shuffling either through multiple workers or spilling it to disk. 
-While a Docker solution makes little sense in the standpoint of scalability - as you're simply adding overhead to your local machine, this is an initial step for a high scalable solution, which could be deployed in either:
+Spark lazy evaluates all dataframes - shuffling either through multiple workers or spilling it to disk whenever it cannot handle all data.
+While a Docker solution makes little sense in the standpoint of scalability as you're simply adding overhead to your local machine, this is an initial step for a high scalable solution, which could be deployed in either:
 - Spark @ AWS EMR Clusters
 - YARN
 - K8s - [There is an interesting operator built by GCP that can enable this](https://github.com/GoogleCloudPlatform/spark-on-k8s-operator)
@@ -139,14 +136,14 @@ While a Docker solution makes little sense in the standpoint of scalability - as
 
 **Enhancements - FS**: Use `repartition` (distributing partitions in memory) and `partitionBy` (distributing partitions in disk) if this ever scale.
 
-## 7. On the Cloud
+## 6. On the Cloud
 
 This is a simple drawing that illustrates how those pieces could fit together in a K8s context. This is an oversimplified architecture, more close to a batch ingestion.
 ![Simple Architecture](./docs/arch_sketch.png)
 
-## 8. Future Enhancements
+## 7. Future Enhancements
 
-### 8.1. Testing
+### 7.1. Testing
 I would like to introduce at very least some unit testings there - I didn't cause I've done this in pretty much one and a half day. 
 
 Each pipeline should have each of those methods tested, while the CSV/Parquet/JSON sinks and loads could be easily tested - those in JDBC context will need `sqlalchemy` and even a docker instance for proper testing (and integrations one).
