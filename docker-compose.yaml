@@ -7,7 +7,19 @@ services:
             - POSTGRES_PASSWORD=123456
             - POSTGRES_DB=jobsity
         volumes:
-            - ./pgdata:/var/lib/postgresql/data:rw
+            - /opt/naniviaa/psqldata:/var/lib/postgresql/data:rw
         restart: always
         ports:
             - "5432:5432"
+    application:
+        build: .
+        container_name: ingestion
+        environment:
+            - ENV SLACK_CHANNELS=None
+            - ENV SLACK_BOT_TOKEN=Nope
+        volumes:
+            - ./application_data/input:/app/input/
+            - ./application_data/output:/app/output/
+        depends_on:
+            - postgres
+        restart: always
