@@ -1,5 +1,6 @@
 from load.base_load import AbstractLoad
-from utils.decode import decode_b64 
+from utils.decode import decode_b64
+
 
 class JDBCLoad(AbstractLoad):
     """This is a generic class meant to easen the process of reading static files in spark such as

@@ -1,10 +1,7 @@
 import json
 
 from argparse import ArgumentParser
-from ast import literal_eval
-
 from pyspark.sql import SparkSession
-import pipeline
 from utils.logger import get_logger_instance
 
 from domain import events
@@ -34,7 +31,6 @@ load = load_mapping[args.load_config["load_type"]](
     **args.load_config["options"],
 )
 
-
 sink = sink_mapping[args.sink_config["sink_type"]](
     spark=spark, **args.sink_config["options"]
 )
@@ -42,10 +38,10 @@ sink = sink_mapping[args.sink_config["sink_type"]](
 logger.info(
     "Booting Pipeline Object %s - Load: %s - Out: %s", pipeline_name, load, sink
 )
+
 df = pipeline_mapping[pipeline_name](
     input=load, output=sink, **args.pipeline.get("options", {})
 ).run()
 
 message_bus.handle(events.PipelineFinish(pipeline_name=pipeline_name))
-
 logger.info("Sucessful - Exiting")
