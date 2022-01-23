@@ -1,6 +1,16 @@
 
+- [2. Intro](#2-intro)
+- [3. Project Structure](#3-project-structure)
+- [4. Mandatory Features:](#4-mandatory-features)
+- [5. Running Samples](#5-running-samples)
+  - [5.1. Reading from CSV and Sinking to JDBC](#51-reading-from-csv-and-sinking-to-jdbc)
+  - [5.2. Reading from JDBC and Sinking to CSV - Aggregated Pipeline](#52-reading-from-jdbc-and-sinking-to-csv---aggregated-pipeline)
+- [6. Scalability](#6-scalability)
+- [7. On the Cloud](#7-on-the-cloud)
+- [8. Future Enhancements](#8-future-enhancements)
+  - [8.1. Testing](#81-testing)
 
-## Intro
+## 2. Intro
 
 This is a simple pipeline processing tool, consisting of three core ideas:
 - Loads
@@ -13,11 +23,45 @@ This is a simple pipeline processing tool, consisting of three core ideas:
 
 **Sinks** Specifies where files will be written
 
-## Project Structure
+## 3. Project Structure
 
+```
+.
+├── docker-compose.yaml
+├── Dockerfile
+├── Makefile
+├── README.MD
+├── source_data
+│   └── trips.csv
+└── src
+    ├── adapters
+    │   └── slack.py
+    ├── domain
+    │   └── events.py
+    ├── load
+    │   ├── base_load.py
+    │   ├── generic_pyspark.py
+    │   ├── __init__.py
+    │   └── jdbc.py
+    ├── main.py
+    ├── pipeline
+    │   ├── base_pipeline.py
+    │   ├── __init__.py
+    │   ├── trips_aggregated.py
+    │   └── trips.py
+    ├── services
+    │   └── message_bus.py
+    ├── sink
+    │   ├── base_sink.py
+    │   ├── generic_pyspark.py
+    │   ├── __init__.py
+    │   └── jdbc.py
+    └── utils
+        ├── decode.py
+        └── logger.py
+```
 
-
-## Mandatory Features: 
+## 4. Mandatory Features:
 - There must be an automated process to ingest and store the data. 100%
 
 ---
@@ -58,32 +102,36 @@ In stores such as columnar stores, data modeling in this scenario should be care
 
 ---
 
-## Running Samples
+## 5. Running Samples
 
-### Reading from CSV and Sinking to JDBC
+### 5.1. Reading from CSV and Sinking to JDBC
 
 PS: `conn_uri` is base64 decoded for the sake of special characters breaking args.
 
+If local: `jdbc:postgresql://localhost:5432/jobsity?user=naniviaa&password=123456`
+If on Docker: `jdbc:postgresql://postgres:5432/jobsity?user=naniviaa&password=123456` which translates to base64: `amRiYzpwb3N0Z3Jlc3FsOi8vcG9zdGdyZXM6NTQzMi9qb2JzaXR5P3VzZXI9bmFuaXZpYWEmcGFz
+c3dvcmQ9MTIzNDU2` 
+
 ``` 
-python main.py --load-config '{"load_type":"GenericPySparkLoad", "options": {"path": "/home/nick/repos/test-jobsity/source_data/trips.csv", "format": "csv", "header": "true"} }' \
-               --sink-config '{"sink_type": "JDBCSink", "options":{"conn_uri": "amRiYzpwb3N0Z3Jlc3FsOi8vbG9jYWxob3N0OjU0MzIvam9ic2l0eT91c2VyPW5hbml2aWFhJnBhc3N3b3JkPTEyMzQ1Ng==", "table": "lala"} }' \
+python main.py --load-config '{"load_type":"GenericPySparkLoad", "options": {"path": "./application/input/sample.csv", "format": "csv", "header": "true"} }' \
+               --sink-config '{"sink_type": "JDBCSink", "options":{"conn_uri": "amRiYzpwb3N0Z3Jlc3FsOi8vbG9jYWxob3N0OjU0MzIvam9ic2l0eT91c2VyPW5hbml2aWFhJnBhc3N3b3JkPTEyMzQ1Ng==", "table": "trips"} }' \
                --pipeline '{"pipeline_name": "Trips", "options":{}}'
 ```
 
-### Reading from JDBC and Sinking to CSV - Aggregated Pipeline
+### 5.2. Reading from JDBC and Sinking to CSV - Aggregated Pipeline
 ```
-python main.py --load-config '{"input_path": "/home/nick/repos/test-jobsity/source_data/trips.csv", "load_type":"JDBCLoad", "options":{"conn_uri": "amRiYzpwb3N0Z3Jlc3FsOi8vbG9jYWxob3N0OjU0MzIvam9ic2l0eT91c2VyPW5hbml2aWFhJnBhc3N3b3JkPTEyMzQ1Ng==", "table": "lala"}  }' \
-               --sink-config '{"sink_type": "GenericPySparkSink", "options":{"format":"json", "path":"./output_data/", "mode":"overwrite"}}' \
-               --pipeline '{"pipeline_name": "TripsAggregated", "options":{}}'
+python main.py --load-config '{"load_type":"JDBCLoad", "options":{"conn_uri": "amRiYzpwb3N0Z3Jlc3FsOi8vbG9jYWxob3N0OjU0MzIvam9ic2l0eT91c2VyPW5hbml2aWFhJnBhc3N3b3JkPTEyMzQ1Ng==", "table": "trips"}  }' \
+               --sink-config '{"sink_type": "GenericPySparkSink", "options":{"format":"json", "path":"./application_data/output/python/", "mode":"overwrite"}}' \
+               --pipeline '{"pipeline_name": "TripsAggregated", "options":{"region":"Turin", "p1":[7.54, 44], "p2":[7.70, 46]}}'
 ```
 
-## Scalability
+## 6. Scalability
 
-## On the Cloud
+## 7. On the Cloud
 
-## Future Enhancements
+## 8. Future Enhancements
 
-### Testing
+### 8.1. Testing
 I would like to introduce at very least some unit testings there - I didn't cause I've done this in pretty much one and a half day. 
 
 Each pipeline should have each of those methods tested, while the CSV/Parquet/JSON sinks and loads could be easily tested - those in JDBC context will need `sqlalchemy` and even a docker instance for proper testing (and integrations one).

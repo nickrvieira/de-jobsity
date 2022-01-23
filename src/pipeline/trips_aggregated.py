@@ -14,16 +14,16 @@ class Coordinate:
 class TripsAggregated(BasePipeline):
     """This pipeline calculates the average weekly travel of a filtered region/box
 
-    It is important to notice that, since we do not have a left join there with calendar, I only calculate
+    It is important to notice that, since we do not have a left join there with a calendar table, I only calculate
     the average of those weeks that had at least one travel
 
     """
 
     def __init__(
         self,
-        region="Turin",
-        p1=[7.54, 44],
-        p2=[7.70, 46],
+        region=None,
+        p1=None,
+        p2=None,
         region_col="region",
         lat_cols=["origin_lat", "destination_lat"],
         lon_cols=["origin_lon", "destination_lon"],
