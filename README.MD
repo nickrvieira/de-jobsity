@@ -84,7 +84,7 @@ polling solution. 100% (NO CREDS THERE)
 ---
 
 - The solution should be scalable to 100 million entries. It is encouraged to simplify the
-data by a data model. Please add proof that the solution is scalable. 50%
+data by a data model. Please add proof that the solution is scalable. 100%
 
 *Commentary*:
 Data models are controversial - mainly in this scenario - Indeed I could create auxiliary tables for: City and Dates, but this is non practical whenever is only a single table - this won't make the solution less or more scalable and worst: will require joins there. 
@@ -108,6 +108,7 @@ For scalability, please refer to item [6. Scalability](#5-scalability)
 PS: `conn_uri` is base64 decoded for the sake of special characters breaking args.
 
 If local: `jdbc:postgresql://localhost:5432/jobsity?user=naniviaa&password=123456`
+
 If on Docker: `jdbc:postgresql://postgres:5432/jobsity?user=naniviaa&password=123456` which translates to base64: `amRiYzpwb3N0Z3Jlc3FsOi8vcG9zdGdyZXM6NTQzMi9qb2JzaXR5P3VzZXI9bmFuaXZpYWEmcGFz
 c3dvcmQ9MTIzNDU2` 
 
