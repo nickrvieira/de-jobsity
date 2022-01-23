@@ -94,6 +94,8 @@ Data models are controversial - mainly in this scenario - Indeed I could create 
 
 In stores such as columnar stores, data modeling in this scenario should be carefully reviewed - It may bring organization, but it adds complexity and, depending on the stack, increases the computational load for both reading (consumer/end user) and writing (pipeline processes).
 
+For scalability, please refer to item [6. Scalability](#6-scalability)
+
 ---
 
 - Use a SQL database. 100%
@@ -127,7 +129,20 @@ python main.py --load-config '{"load_type":"JDBCLoad", "options":{"conn_uri": "a
 
 ## 6. Scalability
 
+Spark lazy evaluates all dataframes - shuffling either through multiple workers or spilling it to disk. 
+While a Docker solution makes little sense in the standpoint of scalability - as you're simply adding overhead to your local machine, this is an initial step for a high scalable solution, which could be deployed in either:
+- Spark @ AWS EMR Clusters
+- YARN
+- K8s - [There is an interesting operator built by GCP that can enable this](https://github.com/GoogleCloudPlatform/spark-on-k8s-operator)
+
+**Enhancements - SQL Wise**: I could have used partition columns & fetch size for parallelizing on read - Check docs for "partitionColumn, lowerBound, upperBound" in [Spark Docs](https://spark.apache.org/docs/latest/sql-data-sources-jdbc.html).
+
+**Enhancements - FS**: Use `repartition` (distributing partitions in memory) and `partitionBy` (distributing partitions in disk) if this ever scale.
+
 ## 7. On the Cloud
+
+This is a simple drawing that illustrates how those pieces could fit together in a K8s context. This is an oversimplified architecture, more close to a batch ingestion.
+![Simple Architecture](./docs/arch_sketch.png)
 
 ## 8. Future Enhancements
 
