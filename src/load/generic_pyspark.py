@@ -1,5 +1,4 @@
 from load.base_load import AbstractLoad
-from pyspark.sql import SparkSession
 
 
 class GenericPySparkLoad(AbstractLoad):
@@ -7,8 +6,8 @@ class GenericPySparkLoad(AbstractLoad):
     CSV, JSON, Parquet etc
     """
 
-    def __init__(self, spark: SparkSession, path: str, **kwargs):
-        self.spark = spark
+    def __init__(self, path: str, **kwargs):
+        super(GenericPySparkLoad, self).__init__(kwargs.pop("spark"))
         self.path = path
         self.options = kwargs
 

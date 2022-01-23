@@ -25,7 +25,9 @@ class BasePipeline(metaclass=ABCMeta):
             self.logger.info("Caching the dataframe")
             df = df.cache()
         for process in self.pipeline:
-            self.logger.info("Running method in %s - %s", self.__class__.__name__, process.__name__)
+            self.logger.info(
+                "Running method in %s - %s", self.__class__.__name__, process.__name__
+            )
             df = process(df)
 
         self.logger.info("Finishing Pipeline %s - Starting sinking", __name__)
