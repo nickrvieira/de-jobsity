@@ -44,6 +44,9 @@ In stores such as columnar stores, data modeling in this scenario should be care
 ## Running Samples
 
 ### Reading from CSV and Sinking to JDBC
+
+PS: `conn_uri` is base64 decoded for the sake of special characters breaking args.
+
 ``` 
 python main.py --load-config '{"load_type":"GenericPySparkLoad", "options": {"path": "/home/nick/repos/test-jobsity/source_data/trips.csv", "format": "csv", "header": "true"} }' \
                --sink-config '{"sink_type": "JDBCSink", "options":{"conn_uri": "amRiYzpwb3N0Z3Jlc3FsOi8vbG9jYWxob3N0OjU0MzIvam9ic2l0eT91c2VyPW5hbml2aWFhJnBhc3N3b3JkPTEyMzQ1Ng==", "table": "lala"} }' \
