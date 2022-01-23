@@ -7,7 +7,11 @@ This is a simple pipeline processing tool, consisting of three core ideas:
 - Sinks
 - Pipelines
 
-**Sinks** specifies 
+**Loads** Specifies how the dataframe will be loaded
+
+**Pipelines** Specifies a order of functions to process a dataframe
+
+**Sinks** Specifies where files will be written
 
 ## Project Structure
 
@@ -15,7 +19,12 @@ This is a simple pipeline processing tool, consisting of three core ideas:
 
 ## Mandatory Features: 
 - There must be an automated process to ingest and store the data. 100%
+
+---
+
 - Trips with similar origin, destination, and time of day should be grouped together. 100%
+
+---
 
 - Develop a way to obtain the weekly average number of trips for an area, defined by a
 bounding box (given by coordinates) or by a region. 100%
@@ -24,10 +33,14 @@ bounding box (given by coordinates) or by a region. 100%
 
 Also important: I've decided to do this fully on Spark - a wiser implementation would check the instances of the loading pipeline and, if is a JDBC - run the query within the Database to minimize data flow/I.O.  There should be two approaches there - one with spark (if the source is a non-jdbc) and one proper for JDBC cons.
 
+---
+
 - Develop a way to inform the user about the status of the data ingestion without using a
 polling solution. 100% (NO CREDS THERE)
 
 *Commentary*: I've create a sort of message bus - with a simple slack model there. It could be a webhook? Email? SMS? All of the previous? Simple to hook up a new adapter and set each notification for each event.
+
+---
 
 - The solution should be scalable to 100 million entries. It is encouraged to simplify the
 data by a data model. Please add proof that the solution is scalable. 50%
@@ -37,9 +50,13 @@ Data models are controversial - mainly in this scenario - Indeed I could create 
 
 In stores such as columnar stores, data modeling in this scenario should be carefully reviewed - It may bring organization, but it adds complexity and, depending on the stack, increases the computational load for both reading (consumer/end user) and writing (pipeline processes).
 
+---
+
 - Use a SQL database. 100%
 
 *Commentary*: Postgres.
+
+---
 
 ## Running Samples
 
@@ -64,7 +81,7 @@ python main.py --load-config '{"input_path": "/home/nick/repos/test-jobsity/sour
 
 ## On the Cloud
 
-## Enhancements
+## Future Enhancements
 
 ### Testing
 I would like to introduce at very least some unit testings there - I didn't cause I've done this in pretty much one and a half day. 
