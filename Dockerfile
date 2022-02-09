@@ -18,9 +18,12 @@ RUN apt update; \
 RUN mkdir -p ${JAR_CUSTOM_PATH} && wget -nc https://jdbc.postgresql.org/download/postgresql-42.2.22.jar -P ${JAR_CUSTOM_PATH}
 
 COPY ./src .
+COPY ./entrypoint.sh .
 COPY ./requirements.txt .
+
+RUN chmod +x ./entrypoint.sh
 
 
 RUN python -m pip install -r requirements.txt 
 
-ENTRYPOINT ["python","main.py"]
+ENTRYPOINT ["./entrypoint.sh"]
