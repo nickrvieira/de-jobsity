@@ -19,4 +19,4 @@ run_aggregation:
 
 cleanup:
 	docker-compose down
-	sudo rm -rf ./application_data /opt/naniviaa/psqldata
+	sudo rm -rf ./application_data ./psqldata

@@ -7,7 +7,7 @@ services:
             - POSTGRES_PASSWORD=123456
             - POSTGRES_DB=jobsity
         volumes:
-            - /opt/naniviaa/psqldata:/var/lib/postgresql/data:rw
+            - ./psqldata:/var/lib/postgresql/data:rw
         restart: always
         ports:
             - "5432:5432"
